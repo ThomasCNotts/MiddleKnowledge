@@ -1,0 +1,95 @@
+##############################
+
+#Paired median test
+
+#If the difference of medians between two groups for paired data is random, then it shouldn't matter if the difference is calculated as:
+
+#Group 1 Median - Group 2 Median
+
+#or
+
+#Group 2 Median - Group 1 Median
+
+#so we randomly select one of these for each pair in the data to generate paired data that we know is random. They we see if we observe the effect. If we do then that gives us evidence that the effect is random and we increment a counter. If we don't then it is evidence that it is not random. We repeat this 1000 times. The p-value (the rpobability that the effect is random) is the counter divided by 1000.
+
+#Read in the data:
+paired <- read.csv("~/Documents/Middle knowledge/Attitude Shock/Paried.csv")
+
+#Calculate the effect we observe; here we use quantiles with effect50 being the median:
+effectDat <- paired$shock-paired$noShock
+
+effect25 <- quantile(effectDat)[[2]]
+effect50 <- quantile(effectDat)[[3]]
+effect75 <- quantile(effectDat)[[4]]
+effect100 <- quantile(effectDat)[[5]]
+
+#Get the counters ready:
+counter25 <- 0
+counter50 <- 0
+counter75 <- 0
+counter100 <- 0
+
+#Start a loop to simulate the random data 1000 times:
+for (j in 1:1000){
+
+#This vector will store the random data that is generated:
+ranEffectDat <- c()
+
+for (i in 1:length(effectDat)){
+if (sample(c(TRUE, FALSE),1)){
+ranEffectDat <- c(ranEffectDat, paired$shock[i]-paired$noShock[i])
+} else {
+ranEffectDat <- c(ranEffectDat, paired$noShock[i]-paired$shock[i])
+}
+}
+
+#Calculate the effect observed in the random data:
+ranEffect25 <- quantile(ranEffectDat)[[2]]
+ranEffect50 <- quantile(ranEffectDat)[[3]]
+ranEffect75 <- quantile(ranEffectDat)[[4]]
+ranEffect100 <- quantile(ranEffectDat)[[5]]
+
+#Is the effect seen in the random data?
+if (abs(ranEffect25) >= abs(effect25)){counter25 <- counter25 + 1}
+if (abs(ranEffect50) >= abs(effect50)){counter50 <- counter50 + 1}
+if (abs(ranEffect75) >= abs(effect75)){counter75 <- counter75 + 1}
+if (abs(ranEffect100) >= abs(effect100)){counter100 <- counter100 + 1}
+}
+
+#Calculate the p-value here
+
+####################
+
+#Unpaired median test
+
+library(sqldf)
+library(ks)
+
+unpaired <- read.csv("/Users/liztc/Documents/Middle knowledge/Attitude Shock/Unpaired.csv")
+
+shock <- sqldf("
+SELECT whiteCount
+FROM unpaired
+WHERE situation = 'shock'")
+
+noShock <- sqldf("
+SELECT whiteCount
+FROM unpaired
+WHERE situation = 'noShock'")
+
+shock <- unlist(shock)
+noShock <- unlist(noShock)
+
+effect <- median(shock) - median(noShock)
+
+roulette <- kde(shock)
+
+counter <- 0
+
+for (i in 1:1000){
+ranEffect <- median(rkde(200, roulette))
+if (abs(ranEffect) >= abs(effect)) {counter <- counter + 1}
+}
+
+
+####################
