@@ -12,6 +12,8 @@
 
 #so we randomly select one of these for each pair in the data to generate paired data that we know is random. They we see if we observe the effect. If we do then that gives us evidence that the effect is random and we increment a counter. If we don't then it is evidence that it is not random. We repeat this 1000 times. The p-value (the rpobability that the effect is random) is the counter divided by 1000.
 
+#For more information about this style of test see: https://youtu.be/cajVExuCeE4
+
 #Read in the data:
 paired <- read.csv("~/Documents/Middle knowledge/Attitude Shock/Paried.csv")
 
