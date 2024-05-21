@@ -64,6 +64,8 @@ if (abs(ranEffect100) >= abs(effect100)){counter100 <- counter100 + 1}
 
 #Unpaired median test
 
+#For more information about this style of test see: https://youtu.be/S41zQEshs5k
+
 library(sqldf)
 library(ks)
 
